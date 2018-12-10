@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Button
-import threading, time, serial, msvcrt, json, webbrowser, sys, vals,pickle
+import (threading, time, serial, msvcrt, json, webbrowser, sys, vals, pickle)
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from pathlib import Path
@@ -133,7 +133,7 @@ class MyHeatPainProgramme(StoppableThread):
                     self.collected = False
                     print('pain rating: ' + str(currentRating))
                     gen.wait(2)
-                
+
         pres.text = ''
         pres.bPrac.color = (0, 1, 0, 0.9)
         pres.bPrac.hovercolor = (0, 1, 0, 0.6)
@@ -532,17 +532,19 @@ class MyPresentation():
                                          closeShape=False,
                                          lineColor="white")
         self.myRatingScale = visual.RatingScale(self.win, low=0, high=20,
-                                                marker='triangle', stretch=1.5, 
+                                                marker='triangle', stretch=1.5,
                                                 tickHeight=1.2, precision=1,
-                                                tickMarks=(0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20),
-                                                labels=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+                                                tickMarks=(
+                                                    0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20),
+                                                labels=[
+                                                    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
                                                 scale='0 = No Pain, 10 = Worst Pain Imaginable',
-                                                acceptText= 'Accept',
+                                                acceptText='Accept',
                                                 maxTime=20, showValue=False)
         self.Question = visual.TextStim(self.win, units='norm', pos=[0, 0.4],
                                         text='What was the maximum pain intensity during the last period?')
         PRpicture = 'PainScale2.png'
-        self.ScalePic = visual.ImageStim(self.win, image=PRpicture, 
+        self.ScalePic = visual.ImageStim(self.win, image=PRpicture,
                                          units='cm', pos=[0, 0])
 
     def run(self, i):
@@ -750,7 +752,8 @@ data_folder = Path('Participant_' + participantID)
 calibration_folder = Path('E:/ThermodeProject/CalibrationFiles')
 data_folder.mkdir(parents=True, exist_ok=True)
 
-Thermode = input('\nChoose the thermode: 0 = RegularThermode_v5, 1 = fMRI Thermode: ')
+Thermode = input(
+    '\nChoose the thermode: 0 = RegularThermode_v5, 1 = fMRI Thermode: ')
 if Thermode == '0':
     SelectedThermode = 'RegularThermode_v5'
 elif Thermode == '1':
