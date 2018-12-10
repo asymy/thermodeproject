@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Button
-import (threading, time, serial, msvcrt, json, webbrowser, sys, vals, pickle)
+import threading, time, serial, msvcrt, json, webbrowser, sys, vals, pickle, datetime
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from pathlib import Path
@@ -399,14 +399,20 @@ class MyBut(object):
 
     def MyExit(self):
         prog.cancel = True
+        ts = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        file_to_open = log_folder / \
+            (ts + '_Participant_' + participantID  + '.json')
+        with open(file_to_open, 'w') as filehandle:
+            json.dump(pres._dataClass.YData, filehandle)
         prog.stop()
         prog.join()
         fetcher.ser.close()
         fetcher.stop()
         fetcher.join()
-        core.quit()
         print('Quit Button Pressed')
-        time.sleep(2)
+        
+        core.quit()
+        
 
     def MyEEGRand1(self, event):
         pres.bEEGRand1.color = (1, 0, 0, 0.9)
@@ -464,7 +470,7 @@ class MyDataClass():
     def __init__(self):
 
         self.XData = [0]
-        self.YData = [0]
+        self.YData = [37]
 
 
 class MyPresentation():
@@ -473,14 +479,17 @@ class MyPresentation():
         # GRAPH
         self._dataClass = dataClass
         self.fig, self.ax = plt.subplots()
+        self.fig.canvas.set_window_title('Thermode Heat Pain EEG')
         plt.subplots_adjust(bottom=0.2)
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)
         self.hLine, = plt.plot(0, 0, 'g')
         self.ax.axes.grid()
         self.fig.set_size_inches(17, 10)
         self.ani = FuncAnimation(self.fig, self.run, interval=10, repeat=True)
         self.ax.axes.set_ylim(19, 51)
-        self.ax.axes.set_ylabel('Temperature (°C)', fontsize=14)
-        self.ax.axes.set_xlabel('Time (s)', fontsize=14)
+        self.ax.axes.set_ylabel('Temperature (°C)', fontsize=16)
+        self.ax.axes.set_xlabel('Time (s)', fontsize=16)
         self.hLine.set_color('b')
 
         def createButton(pos, text, function):
@@ -518,7 +527,7 @@ class MyPresentation():
 
         # PSYCHOPY
         self.mon = monitors.Monitor(name='Lonovo')
-        self.win = visual.Window(fullscr=True, screen=1, monitor=self.mon)
+        self.win = visual.Window(fullscr=True, size=([1920, 1200]), screen=1, monitor=self.mon)
         self.mes = visual.TextStim(self.win, text='')
         self.mes.height = .05
         self.mes.setAutoDraw(True)  # automatically draw every frame
@@ -555,7 +564,7 @@ class MyPresentation():
         self.hLine.axes.set_xlim(
             np.max(self._dataClass.XData)-60, np.max(self._dataClass.XData))
         self.ax.legend([str(currentTemp)], loc='upper left',
-                       fontsize='xx-large')
+                       fontsize=18)
 
         # PSYCHOPY
         if self.text == '+':
@@ -624,6 +633,9 @@ class MyDataFetchClass(StoppableThread):
             self.ser.close()
             core.quit()
             sys.exit()
+
+        global startTime 
+        startTime = time.time()
 
     def poll_temp(self):
         self.ser.write(str.encode('M000'))
@@ -748,8 +760,9 @@ class general(threading.Thread):
 vals.initialise_vals()
 vals.initialise_thermodes()
 participantID = input('Enter the Participant ID: ')
-data_folder = Path('Participant_' + participantID)
+data_folder = Path('ParticipantFiles/Participant_' + participantID)
 calibration_folder = Path('E:/ThermodeProject/CalibrationFiles')
+log_folder = Path('logs')
 data_folder.mkdir(parents=True, exist_ok=True)
 
 Thermode = input(
@@ -763,7 +776,8 @@ else:
 print('Thermode Selected: ' + SelectedThermode + '\n')
 
 currentRating = []
-startTime = time.time()
+# startTime = time.time()
+startTime = []
 gen = general()
 data = MyDataClass()
 but = MyBut()
