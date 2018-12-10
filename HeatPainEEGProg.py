@@ -290,6 +290,8 @@ class MyHeatPainProgramme(StoppableThread):
         gen.timer(Tr, self.Rest)
         pres.bCali.color = (0, 1, 0, 0.9)
         pres.bCali.hovercolor = (0, 1, 0, 0.6)
+        from CalibrationPlot import CalibratedPlot_Participant
+        CalibratedPlot_Participant(participantID)
         self.SetButtonFalse()
 
     def EEGAscend(self):
