@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Button
+from sklearn.linear_model import LinearRegression
+from pathlib import Path
+from psychopy import visual, core, monitors, event
+import numpy as np
 import threading
 import time
 import serial
@@ -10,10 +14,6 @@ import sys
 import vals
 import pickle
 import datetime
-import numpy as np
-from sklearn.linear_model import LinearRegression
-from pathlib import Path
-from psychopy import visual, core, monitors, event
 
 
 class StoppableThread(threading.Thread):
@@ -580,8 +580,10 @@ class MyPresentation():
 
         # PSYCHOPY
         self.mon = monitors.Monitor(name='Lonovo')
-        self.win = visual.Window(fullscr=True, size=(
-            [1920, 1200]), screen=1, monitor=self.mon)
+        self.win = visual.Window(fullscr=True,
+                                 size=self.mon.getSizePix(),
+                                 screen=1,
+                                 monitor=self.mon)
         self.mes = visual.TextStim(self.win, text='')
         self.mes.height = .05
         self.mes.setAutoDraw(True)  # automatically draw every frame
@@ -834,7 +836,17 @@ elif Thermode == '1':
     SelectedThermode = 'fMRIThermode'
 else:
     SelectedThermode = 'RegularThermode_v5'
-print('Thermode Selected: ' + SelectedThermode + '\n')
+print('Thermode Selected: ' + SelectedThermode)
+
+Monitor = input(
+    '\nChoose the Monitor: 0 = Lonovo, 1 = Dell: ')
+if Monitor == '0':
+    monitorName = 'Lonovo'
+elif Monitor == '1':
+    monitorName = 'Dell'
+else:
+    monitorName = 'Lonovo'
+print('Monitor Selected: ' + monitorName + '\n')
 
 currentRating = []
 # startTime = time.time()
