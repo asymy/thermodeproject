@@ -1,7 +1,15 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Button
-import threading, time, serial, msvcrt, json, webbrowser, sys, vals, pickle, datetime
+import threading
+import time
+import serial
+import json
+import webbrowser
+import sys
+import vals
+import pickle
+import datetime
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from pathlib import Path
@@ -42,21 +50,21 @@ class MyHeatPainProgramme(StoppableThread):
 
     def run(self):
         while not self.stopped():
-            if but.PracticeRun == True:
+            if but.PracticeRun:
                 self.Practice()
-            elif but.TrainingRun == True:
+            elif but.TrainingRun:
                 self.Training()
-            elif but.CalibrationRun == True:
+            elif but.CalibrationRun:
                 self.Calibration()
-            elif but.HPEEGRun == True:
+            elif but.HPEEGRun:
                 self.EEGAscend()
-            elif but.HPEEGRand1Run == True:
+            elif but.HPEEGRand1Run:
                 self.EEGRand(1)
-            elif but.HPEEGRand2Run == True:
+            elif but.HPEEGRand2Run:
                 self.EEGRand(2)
-            elif but.PreCapRun == True:
+            elif but.PreCapRun:
                 self.PreCapHP()
-            elif but.PreHeatRun == True:
+            elif but.PreHeatRun:
                 self.PreHeat()
             else:
                 time.sleep(0.1)
@@ -66,9 +74,12 @@ class MyHeatPainProgramme(StoppableThread):
         gen.wait(2)
         pres.text = '+'
         gen.wait(2)
-        # Set temperature to baseline temp, check it has reached this, send EEG trigger, hold for rest period
-        # set temperature to noxious temp, send EEG trigger, check it as reached temp, send another EEG trigger
-        # wait for hold period, send another EEG trigger, set temp back to baseline, check it has reached, send another EEG trigger
+        # Set temperature to baseline temp, check it has reached this, send
+        # EEG trigger, hold for rest period.
+        # set temperature to noxious temp, send EEG trigger, check it as
+        # reached temp, send another EEG trigger
+        # wait for hold period, send another EEG trigger, set temp back to
+        # baseline, check it has reached, send another EEG trigger
         # loop back to begining, and do for all noxious temps
         self.setandcheck(baselineTemp)
         T = time.time()
@@ -91,44 +102,54 @@ class MyHeatPainProgramme(StoppableThread):
             gen.EEGTrigger(15)
             self.collected = False
             pres.text = 'rt'
-            while self.collected == False and prog.cancel == False:
+            while self.collected is False and prog.cancel is False:
                 gen.wait(0.05)
             gen.wait(.5)
             print('\tPain Rating to last Temperature = ' + str(currentRating))
             gen.wait(.5)
             if x < len(noxioustemps) - 1:
                 print('\tNext Temperature = ' +
-                      str(noxioustemps[x+1]) + '°C, for ' + str(holdTimes[x+1]) + 's.')
+                      str(noxioustemps[x+1]) + '°C, for ' +
+                      str(holdTimes[x+1]) + 's.')
             gen.timer(T, self.Rest)
-            if prog.cancel == False:
+            if not prog.cancel:
                 self.allRatings[x] = currentRating
                 gen.EEGTrigger(12)
             else:
                 break
-            if self.EEG == False:
+            if not self.EEG:
                 if currentRating > 8:
                     break
-            elif self.EEG == True:
+            elif self.EEG:
                 if currentRating > 9:
                     break
 
     def Practice(self):
         print('Practice Run')
-        messages = ("During the stimulation a fixation cross will appear on the screen.\nPlease relax, and focus on the cross when it is on the screen.\nAn example of the cross is on the next screen.",
-                    "After the Heat Stimulus, a rating scale will appear on the screen.\nClick on the line with the mouse, and drag the marker to change your selection.\nClick on the button to confirm your answer.",
-                    "You are now experiencing no pain, please use the scale to indicate this.",
-                    "You are now experiencing mild pain, please use the scale to indicate this.",
-                    "You are now experiencing extreme pain, please use the scale to indicate this.")
-        stim = '+', 'rt', 'rt', 'rt', 'rt'
+        messages = (('During the stimulation a fixation cross will appear on '
+                     'the screen.\nPlease relax, and focus on the cross when '
+                     'it is on the screen.\nAn example of the cross is on the '
+                     'next screen.'),
+                    ('After the Heat Stimulus, a rating scale will appear on '
+                     'the screen.\nClick on the line with the mouse, and drag '
+                     'the marker to change your selection.\nClick on the '
+                     'button to confirm your answer.'),
+                    ('You are now experiencing no pain, '
+                     'please use the scale to indicate this.'),
+                    ('You are now experiencing mild pain, '
+                     'please use the scale to indicate this.'),
+                    ('You are now experiencing extreme pain, '
+                     'please use the scale to indicate this.'))
+        stim = ('+', 'rt', 'rt', 'rt', 'rt')
         for x in range(len(messages)):
-            if prog.cancel == False:
+            if not prog.cancel:
                 pres.text = messages[x]
                 gen.wait(2)
                 pres.text = stim[x]
                 if x == 0:
                     gen.wait(2)
                 else:
-                    while not self.collected and prog.cancel == False:
+                    while self.collected is False and prog.cancel is False:
                         gen.wait(0.05)
                     self.collected = False
                     print('pain rating: ' + str(currentRating))
@@ -161,9 +182,10 @@ class MyHeatPainProgramme(StoppableThread):
         holdTimes = np.ones_like(noxioustemps)*preCapData['HoldTime']
         pres.text = "Starting Pre-Treatment Session"
         self.HeatPainRun(startingTemperature, noxioustemps, holdTimes)
-        if prog.cancel == False:
+        if not prog.cancel:
             List = np.resize(
-                np.append(noxioustemps, self.allRatings), (2, len(noxioustemps)))
+                np.append(noxioustemps, self.allRatings),
+                (2, len(noxioustemps)))
             gen.savelist(List, 'PreCapPainRatings')
         pres.bPreCap.color = (0, 1, 0, 0.9)
         pres.bPreCap.hovercolor = (0, 1, 0, 0.6)
@@ -177,25 +199,53 @@ class MyHeatPainProgramme(StoppableThread):
         holdTimes = preHeatData['HoldTime']
         restTime = preHeatData['RestTime']
         slope = preHeatData['Slope']
+        sample = 60
+        self.allRatings = np.zeros((int(holdTimes/60)+1, 1))
 
         pres.text = "Starting Pre-Heat Session"
         self.setandcheck(startingTemp)
         T = time.time()
-        gen.timer(T, 15)
+        gen.timer(T, 10)
         pres.text = '+'
-        gen.wait(5)
+        gen.wait(10)
         self.setandcheck(noxioustemps)
         T = time.time()
-        interval = np.arange(10, holdTimes, 10)
-        for x in interval:
-            if prog.cancel == 'False':
-                gen.timer(T, x)
-                print('time elapsed: ' + str(x))
-        if prog.cancel == 'False':
-            gen.timer(T, holdTimes)
-            print('time elapsed: ' + str(holdTimes))
-            print('Apply Capsaicin')
-            self.setandcheck(startingTemp)
+        endTime = T + holdTimes
+
+        time_in_s = holdTimes+2
+        currentTime = time.time()
+        startTime = currentTime
+        endTime = startTime + time_in_s
+        self.timeLeft = endTime - currentTime
+        i = 0
+        while currentTime < endTime and prog.cancel is False:
+            if np.around(self.timeLeft-1, decimals=0) % sample == 0:
+                self.collected = False
+                pres.text = 'rt'
+                while self.collected is False and prog.cancel is False:
+                    gen.wait(0.05)
+                    currentTime = time.time()
+                    self.timeLeft = endTime - currentTime
+                gen.wait(.5)
+                print('\n\tPain Rating to last Temperature = ' +
+                      str(currentRating))
+                self.allRatings[i] = currentRating
+                i = i+1
+
+            else:
+                gen.wait(0.05)
+                currentTime = time.time()
+                self.timeLeft = endTime - currentTime
+                if np.around(self.timeLeft, decimals=1) % 1 == 0:
+                    txt = ('time left: ' +
+                           str(int(np.around(self.timeLeft, decimals=0))) +
+                           's ')
+                    sys.stdout.write('\r' + txt)
+                    sys.stdout.flush()
+
+        print('Apply Capsaicin')
+        self.setandcheck(startingTemp)
+        gen.savelist(self.allRatings, 'PreHeatRatings')
         gen.wait(20)
         pres.bPreHeat.color = (0, 1, 0, 0.9)
         pres.bPreHeat.hovercolor = (0, 1, 0, 0.6)
@@ -219,26 +269,27 @@ class MyHeatPainProgramme(StoppableThread):
         self.setandcheck(startingTemp)
         Tr = time.time()
         for sample in range(max_samples):
-            if prog.cancel == False:
+            if not prog.cancel:
                 noxioustemps = np.append(noxioustemps, nextTemp)
                 print('\tNext Temperature = ' + str(nextTemp) + '°C')
                 gen.timer(Tr, self.Rest)
                 self.setandcheck(noxioustemps[sample])
                 Tn = time.time()
                 gen.timer(Tn, self.Hold)
-            if prog.cancel == False:
+            if not prog.cancel:
                 self.setandcheck(startingTemp)
                 Tr = time.time()
                 gen.wait(3)
                 pres.text = 'rt'
                 prog.collected = False
-            while prog.collected == False and prog.cancel == False:
+            while prog.collected is False and prog.cancel is False:
                 gen.wait(0.5)
-            if prog.cancel == False:
+            if not prog.cancel:
                 self.allRatings = np.append(self.allRatings, currentRating)
-                print('\tPain Rating to last Temperature = ' + str(currentRating))
+                print('\tPain Rating to last Temperature = ' +
+                      str(currentRating))
                 if sample > 2:
-                    if currentRating < 8. and sequence == True:
+                    if currentRating < 8. and sequence:
                         targetRating = currentRating+0.8
                         if targetRating > 8:
                             targetRating = 8.
@@ -267,9 +318,10 @@ class MyHeatPainProgramme(StoppableThread):
                 if nextTemp > 50.0:
                     nextTemp = 50.0
 
-        if prog.cancel == False:
+        if not prog.cancel:
             List = np.resize(
-                np.append(noxioustemps, self.allRatings), (2, len(noxioustemps)))
+                np.append(noxioustemps, self.allRatings),
+                (2, len(noxioustemps)))
             gen.savelist(List, 'CalibratedResults')
 
             targetRating = np.array([1, 2, 3, 4, 5, 6, 7, 8])
@@ -277,7 +329,7 @@ class MyHeatPainProgramme(StoppableThread):
                 self.allRatings, noxioustemps, targetRating), decimals=1)
             i = np.where(self.newTemps > 50.)
             self.newTemps[i[0]] = 50.
-            gen.savelist(newTemps, 'EEGAscendTemps')
+            gen.savelist(self.newTemps, 'EEGAscendTemps')
 
             targetRating = np.array(
                 [1, 1.7, 2.4, 3.1, 3.8, 4.5, 5.2, 5.9, 6.6, 7.3, 8])
@@ -312,8 +364,8 @@ class MyHeatPainProgramme(StoppableThread):
             with open(file_to_open, 'w') as filehandle:
                 json.dump(List, filehandle)
             self.SetButtonFalse()
-        except:
-            print('no calibration data')
+        except FileNotFoundError as fnf_error:
+            print(fnf_error)
         pres.bEEGAscend.color = (0, 1, 0, 0.9)
         pres.bEEGAscend.hovercolor = (0, 1, 0, 0.6)
         self.SetButtonFalse()
@@ -375,10 +427,11 @@ class MyHeatPainProgramme(StoppableThread):
         print('Finished\n\n')
 
     def setandcheck(self, temp):
-        if self.cancel == False:
+        if not self.cancel:
             self.targetTemp = temp
             self.change = True
-            while currentTemp >= self.targetTemp + self.tolerance or currentTemp <= self.targetTemp - self.tolerance:
+            while (currentTemp >= self.targetTemp + self.tolerance
+                   or currentTemp <= self.targetTemp - self.tolerance):
                 gen.wait(0.1)
 
 
@@ -401,7 +454,7 @@ class MyBut(object):
         prog.cancel = True
         ts = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         file_to_open = log_folder / \
-            (ts + '_Participant_' + participantID  + '.json')
+            (ts + '_Participant_' + participantID + '.json')
         with open(file_to_open, 'w') as filehandle:
             json.dump(pres._dataClass.YData, filehandle)
         prog.stop()
@@ -410,9 +463,8 @@ class MyBut(object):
         fetcher.stop()
         fetcher.join()
         print('Quit Button Pressed')
-        
+
         core.quit()
-        
 
     def MyEEGRand1(self, event):
         pres.bEEGRand1.color = (1, 0, 0, 0.9)
@@ -455,11 +507,12 @@ class MyBut(object):
         self.TrainingRun = True
 
     def AboutMe(self, event):
-        webbrowser.open("readme.txt")
+        webbrowser.open("aboutme.txt")
 
     def MyCancel(self, event):
         prog.cancel = True
         CTimer = threading.Timer(5, self.CancelCancel)
+        CTimer.start()
 
     def CancelCancel(self):
         prog.cancel = False
@@ -527,7 +580,8 @@ class MyPresentation():
 
         # PSYCHOPY
         self.mon = monitors.Monitor(name='Lonovo')
-        self.win = visual.Window(fullscr=True, size=([1920, 1200]), screen=1, monitor=self.mon)
+        self.win = visual.Window(fullscr=True, size=(
+            [1920, 1200]), screen=1, monitor=self.mon)
         self.mes = visual.TextStim(self.win, text='')
         self.mes.height = .05
         self.mes.setAutoDraw(True)  # automatically draw every frame
@@ -535,23 +589,30 @@ class MyPresentation():
         self.text = ''
         self.fixation = visual.ShapeStim(self.win,
                                          units='cm',
-                                         vertices=((0, -.25), (0, .25),
-                                                   (0, 0), (-.25, 0), (.25, 0)),
+                                         vertices=((0, -.25),
+                                                   (0,  .25),
+                                                   (0,    0),
+                                                   (-.25,    0),
+                                                   (.25,    0)),
                                          lineWidth=2,
                                          closeShape=False,
                                          lineColor="white")
-        self.myRatingScale = visual.RatingScale(self.win, low=0, high=20,
-                                                marker='triangle', stretch=1.5,
-                                                tickHeight=1.2, precision=1,
-                                                tickMarks=(
-                                                    0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20),
-                                                labels=[
-                                                    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-                                                scale='0 = No Pain, 10 = Worst Pain Imaginable',
-                                                acceptText='Accept',
-                                                maxTime=20, showValue=False)
-        self.Question = visual.TextStim(self.win, units='norm', pos=[0, 0.4],
-                                        text='What was the maximum pain intensity during the last period?')
+        self.myRatingScale = visual.RatingScale(
+            self.win, low=0, high=20,
+            marker='triangle', stretch=1.5,
+            tickHeight=1.2, precision=1,
+            tickMarks=(0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20),
+            labels=['0', '1', '2', '3', '4',
+                    '5', '6', '7', '8', '9', '10'],
+            scale=('0 = No Pain, 10 = Worst Pain Imaginable'),
+            acceptText='Accept',
+            maxTime=20, showValue=False)
+        self.Question = visual.TextStim(
+            self.win,
+            units='norm',
+            pos=[0, 0.4],
+            text=('What was the maximum pain '
+                  'intensity during the last period?'))
         PRpicture = 'PainScale2.png'
         self.ScalePic = visual.ImageStim(self.win, image=PRpicture,
                                          units='cm', pos=[0, 0])
@@ -571,7 +632,7 @@ class MyPresentation():
             self.mes.setText('')
             self.fixation.draw()
         elif self.text == 'rt':
-            if prog.cancel == False:
+            if not prog.cancel:
                 self.mes.setText('')
                 self.Question.draw()
                 self.ScalePic.draw()
@@ -584,7 +645,7 @@ class MyPresentation():
                     self.myRatingScale.reset()
                     self.text = '+'
                     gen.EEGTrigger(16)
-            elif prog.cancel == True:
+            elif prog.cancel:
                 self.mes.setText('')
         else:
             self.mes.setText(self.text)
@@ -634,7 +695,7 @@ class MyDataFetchClass(StoppableThread):
             core.quit()
             sys.exit()
 
-        global startTime 
+        global startTime
         startTime = time.time()
 
     def poll_temp(self):
@@ -648,7 +709,7 @@ class MyDataFetchClass(StoppableThread):
             callTime = time.time()
             currentTemp = self.poll_temp()
             # add data to data class
-            if prog.change == True:
+            if prog.change:
                 gen.set_temp(prog.targetTemp, prog.Slope)
                 prog.change = False
             self._dataClass.XData.append(time.time()-startTime)
@@ -675,7 +736,7 @@ class general(threading.Thread):
         start = time.time()
         endTime = start + time_in_s
         currentTime = time.time()
-        while currentTime < endTime and prog.cancel == False:
+        while currentTime < endTime and prog.cancel is False:
             time.sleep(0.1)
             currentTime = time.time()
 
@@ -704,7 +765,7 @@ class general(threading.Thread):
     def timer(self, startTime, time_in_s):
         endTime = startTime + time_in_s
         currentTime = time.time()
-        while currentTime < endTime and prog.cancel == False:
+        while currentTime < endTime and prog.cancel is False:
             time.sleep(0.1)
             currentTime = time.time()
 
@@ -737,7 +798,7 @@ class general(threading.Thread):
         return y_predict
 
     def savelist(self, nums, namelist):
-        if prog.cancel == False:
+        if not prog.cancel:
             List = nums.tolist()
             file_to_open = data_folder / \
                 (namelist + '_Participant' + participantID + '.json')
@@ -752,7 +813,7 @@ class general(threading.Thread):
         return Data
 
     def EEGTrigger(self, num):
-        if prog.EEG == True:
+        if prog.EEG:
             print('EEG Trigger ' + str(num))
             # self.serE
 
