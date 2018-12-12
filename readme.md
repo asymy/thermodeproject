@@ -13,14 +13,15 @@ There are various buttons on the graph which will start various programs.
 
 - [ ] Refactor
   - [ ] change to multiple more manageable files
+  - [ ] flags to set button to false
   - [ ] Make sure nothing is hardcoded that should be from input variables
-- [ ] Change to consistant file output - JSON or PICKLE
 - [ ] add slope and rest time editing in each program, but default to inital values if not supplied
-- [ ] Baseline recording script - independent?
-  - [ ] move 'practice' to seperate programme
+- [ ] move 'practice' to seperate programme?
 
 ### Done List ###
 
 - [x] Install flake8 and make sure formatting is good
+- [x] Change to consistant file output - JSON or PICKLE
+- [x] Baseline recording script - independent?
 
 

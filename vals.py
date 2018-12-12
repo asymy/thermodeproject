@@ -1,12 +1,12 @@
-import pickle
+import json
 from pathlib import Path
 calibration_folder = Path('E:/ThermodeProject/CalibrationFiles')
 
 
-def pkl_save(var, file_Name):
-    fileObject = open((calibration_folder / file_Name), 'wb')
-    pickle.dump(var, fileObject)
-    fileObject.close()
+def json_write(data, namelist):
+    file_to_open = Path('./CalibrationFiles') / (namelist + '.json')
+    with open(file_to_open, 'w') as filehandle:
+        json.dump(data, filehandle)
 
 
 def initialise_thermodes():
@@ -18,7 +18,7 @@ def initialise_thermodes():
         'OffSetTemp_AD': 27,
         'ScaleFactorTemp_AD': 69.1
     }
-    pkl_save(thermode_v5, 'RegularThermode_v5')
+    json_write(thermode_v5, 'RegularThermode_v5')
 
     thermode_fMRI = {
         'OffSetTemp_DA': 420,
@@ -28,7 +28,8 @@ def initialise_thermodes():
         'OffSetTemp_AD': 92,
         'ScaleFactorTemp_AD': 68.6
     }
-    pkl_save(thermode_fMRI, 'fMRIThermode')
+    json_write(thermode_fMRI, 'fMRIThermode')
+
 
 def initialise_vals():
     # Initial data
@@ -39,7 +40,7 @@ def initialise_vals():
         'HoldTime': 5.,
         'tolerance': 0.4,
     }
-    pkl_save(startingdata, 'startingdata')
+    json_write(startingdata, 'startingdata')
 
     # Training data
     trainingdata = {
@@ -49,7 +50,7 @@ def initialise_vals():
         'RestTime': 30.,
         'HoldTime': 5.,
     }
-    pkl_save(trainingdata, 'trainingdata')
+    json_write(trainingdata, 'trainingdata')
 
     # PreCap data
     precapdata = {
@@ -59,7 +60,7 @@ def initialise_vals():
         'RestTime': 30.,
         'HoldTime': 5.,
     }
-    pkl_save(precapdata, 'precapdata')
+    json_write(precapdata, 'precapdata')
 
     # PreHeat data
     preheatdata = {
@@ -69,7 +70,7 @@ def initialise_vals():
         'RestTime': 30.,
         'HoldTime': 300.,
     }
-    pkl_save(preheatdata, 'preheatdata')
+    json_write(preheatdata, 'preheatdata')
 
     # Calibration data
     calibrationdata = {
@@ -80,4 +81,12 @@ def initialise_vals():
         'HoldTime': 5.,
         'maxSamples': 12
     }
-    pkl_save(calibrationdata, 'calibrationdata')
+    json_write(calibrationdata, 'calibrationdata')
+
+
+def initialise():
+    initialise_thermodes()
+    initialise_vals()
+
+
+initialise()

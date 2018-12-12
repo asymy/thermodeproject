@@ -1,4 +1,5 @@
 from psychopy import visual, core, monitors
+from EEGControl import EEGControl
 # import serial
 
 
@@ -20,13 +21,11 @@ class MyPresentation():
         self.mes.height = .05
         self.mes.setAutoDraw(True)  # automatically draw every frame
         self.win.flip()
+        v = .25
+        vx = ((0, -v), (0, v), (0, 0), (-v, 0), (v, 0))
         self.fixation = visual.ShapeStim(self.win,
                                          units='cm',
-                                         vertices=((0, -.25),
-                                                   (0, .25),
-                                                   (0, 0),
-                                                   (-.25, 0),
-                                                   (.25, 0)),
+                                         vertices=vx,
                                          lineWidth=2,
                                          closeShape=False,
                                          lineColor="white")
@@ -42,20 +41,28 @@ class MyPresentation():
             self.prompt.draw()
             self.win.flip()
             core.wait(10)
-            EEGTrigger(start)
+            EEGControl.EEGTrigger(start)
             self.fixation.draw()
             self.win.flip()
             core.wait(int(time))
-
-
-def EEGTrigger(input):
-    print(input)
+            EEGControl.EEGTrigger(stop)
+        print('Finished Baseline Recording')
 
 
 pres = MyPresentation()
+EEGControl = EEGControl()
 start = 5
+stop = 6
 
-time = input('Time to record for (in seconds): ')
+defaultTime = 30
+
+inputTime = input('[Default = ' + str(defaultTime) +
+                  's] Time to record for (in seconds): ')
+if inputTime:
+    time = inputTime
+else:
+    time = defaultTime
+
 input('Press Enter to begin.')
 
 pres.run()
