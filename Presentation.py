@@ -6,12 +6,13 @@ from psychopy import visual, core, monitors, event
 import numpy as np
 import webbrowser
 import datetime
+import threading
 
 import config
 from generalfunc import general
 from EEGControl import EEGControl
 
-
+EEGControl = EEGControl()
 gen = general()
 
 
@@ -45,30 +46,37 @@ class MyPresentation():
 
         delta = 0.10
         a, b, c, d = 0.86, 0.05, 0.09, 0.06
-        self.bCancel = createButton([a, b, c, d], 'Cancel', self.MyCancel)
+        config.buttonArray['Cancel'] = createButton(
+            [a, b, c, d], 'Cancel', self.MyCancel)
         a = a-delta
-        self.bEEGRand2 = createButton(
+        config.buttonArray['EEGRand2'] = createButton(
             [a, b, c, d], 'EEG Rand 2', self.MyEEGRand2)
         a = a-delta
-        self.bEEGRand1 = createButton(
+        config.buttonArray['EEGRand1'] = createButton(
             [a, b, c, d], 'EEG Rand 1', self.MyEEGRand1)
         a = a-delta
-        self.bEEGAscend = createButton(
+        config.buttonArray['EEGAscend'] = createButton(
             [a, b, c, d], 'EEG Ascending', self.MyEEGAscend)
         a = a-delta
-        self.bCali = createButton([a, b, c, d], 'Calibration', self.MyCali)
+        config.buttonArray['Calibration'] = createButton(
+            [a, b, c, d], 'Calibration', self.MyCali)
         a = a-delta
-        self.bPreHeat = createButton([a, b, c, d], 'Pre Heat', self.MyPreHeat)
+        config.buttonArray['preHeat'] = createButton(
+            [a, b, c, d], 'Pre Heat', self.MyPreHeat)
         a = a-delta
-        self.bPreCap = createButton([a, b, c, d], 'Pre Cap', self.MyPreCap)
+        config.buttonArray['PreCap'] = createButton(
+            [a, b, c, d], 'Pre Cap', self.MyPreCap)
         a = a-delta
-        self.bTraining = createButton(
+        config.buttonArray['Training'] = createButton(
             [a, b, c, d], 'Training', self.MyTraining)
         a = a-delta
-        self.bPrac = createButton([a, b, c, d], 'Practice', self.MyPractice)
+        config.buttonArray['Practice'] = createButton(
+            [a, b, c, d], 'Practice', self.MyPractice)
         b = 0.91
-        self.bHelp = createButton([0.07, b, c, d], 'About', self.AboutMe)
-        self.bQuit = createButton([0.85, b, c, d], 'Quit', self.MyQuit)
+        config.buttonArray['About'] = createButton(
+            [0.07, b, c, d], 'About', self.AboutMe)
+        config.buttonArray['Quit'] = createButton(
+            [0.85, b, c, d], 'Quit', self.MyQuit)
 
         # PSYCHOPY
         self.mon = monitors.Monitor(name='Lonovo')
@@ -80,7 +88,7 @@ class MyPresentation():
         self.mes.height = .05
         self.mes.setAutoDraw(True)  # automatically draw every frame
         self.win.flip()
-        self.text = ''
+        config.text = ''
         self.fixation = visual.ShapeStim(self.win,
                                          units='cm',
                                          vertices=((0, -.25),
@@ -112,6 +120,7 @@ class MyPresentation():
                                          units='cm', pos=[0, 0])
 
     def run(self, i):
+        # print(config.text)
         # GRAPH
         self.hLine.set_data(self._dataClass.XData, self._dataClass.YData)
         self.hLine.axes.set_xlim(
@@ -120,10 +129,10 @@ class MyPresentation():
                        fontsize=18)
 
         # PSYCHOPY
-        if self.text == '+':
+        if config.text == '+':
             self.mes.setText('')
             self.fixation.draw()
-        elif self.text == 'rt':
+        elif config.text == 'rt':
             if not config.cancelProg:
                 self.mes.setText('')
                 self.Question.draw()
@@ -135,19 +144,16 @@ class MyPresentation():
                     config.currentRating = (self.myRatingScale.getRating())/2.
                     event.clearEvents()
                     self.myRatingScale.reset()
-                    self.text = '+'
+                    config.text = '+'
                     EEGControl.EEGTrigger(16)
             elif config.cancelProg:
                 self.mes.setText('')
         else:
-            self.mes.setText(self.text)
+            self.mes.setText(config.text)
         self.win.flip()
 
     def MyQuit(self, event):
         config.cancelProg = True
-        self.MyExit()
-
-    def MyExit(self):
         name = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         fileName = (name + '_Participant' + config.participantID + '.json')
         data = {
@@ -155,13 +161,12 @@ class MyPresentation():
             'temp': self._dataClass.YData
         }
         gen.json_write(config.folders['log'], data, fileName)
-        prog.stop()
-        prog.join()
-        fetcher.ser.close()
-        fetcher.stop()
-        fetcher.join()
+        for thread in threading.enumerate():
+            if thread.name is not 'MainThread':
+                print(thread.name)
+                thread.stop()
+                thread.join()
         print('Quit Button Pressed')
-
         core.quit()
 
         config.buttonState = {
@@ -177,43 +182,59 @@ class MyPresentation():
         }
 
     def MyEEGRand1(self, event):
-        self.bEEGRand1.color = (1, 0, 0, 0.9)
-        self.bEEGRand1.hovercolor = (1, 0, 0, 0.6)
+        config.buttonArray['EEGRand1'].color = (
+            config.buttonColour['postClick'][0])
+        config.buttonArray['EEGRand1'].hovercolor = (
+            config.buttonColour['postClick'][1])
         config.buttonState['HPEEGRand1Run'] = True
 
     def MyEEGRand2(self, event):
-        self.bEEGRand2.color = (1, 0, 0, 0.9)
-        self.bEEGRand2.hovercolor = (1, 0, 0, 0.6)
+        config.buttonArray['EEGRand2'].color = (
+            config.buttonColour['postClick'][0])
+        config.buttonArray['EEGRand2'].hovercolor = (
+            config.buttonColour['postClick'][1])
         config.buttonState['HPEEGRand2Run'] = True
 
     def MyEEGAscend(self, event):
-        self.bEEGAscend.color = (1, 0, 0, 0.9)
-        self.bEEGAscend.hovercolor = (1, 0, 0, 0.6)
+        config.buttonArray['EEGAscend'].color = (
+            config.buttonColour['postClick'][0])
+        config.buttonArray['EEGAscend'].hovercolor = (
+            config.buttonColour['postClick'][1])
         config.buttonState['HPEEGRun'] = True
 
     def MyPractice(self, event):
-        self.bPrac.color = (1, 0, 0, 0.9)
-        self.bPrac.hovercolor = (1, 0, 0, 0.6)
+        config.buttonArray['Practice'].color = (
+            config.buttonColour['postClick'][0])
+        config.buttonArray['Practice'].hovercolor = (
+            config.buttonColour['postClick'][1])
         config.buttonState['PracticeRun'] = True
 
     def MyCali(self, event):
-        self.bCali.color = (1, 0, 0, 0.9)
-        self.bCali.hovercolor = (1, 0, 0, 0.6)
+        config.buttonArray['Calibration'].color = (
+            config.buttonColour['postClick'][0])
+        config.buttonArray['Calibration'].hovercolor = (
+            config.buttonColour['postClick'][1])
         config.buttonState['CalibrationRun'] = True
 
     def MyPreCap(self, event):
-        self.bPreCap.color = (1, 0, 0, 0.9)
-        self.bPreCap.hovercolor = (1, 0, 0, 0.6)
+        config.buttonArray['PreCap'].color = (
+            config.buttonColour['postClick'][0])
+        config.buttonArray['PreCap'].hovercolor = (
+            config.buttonColour['postClick'][1])
         config.buttonState['PreCapRun'] = True
 
     def MyPreHeat(self, event):
-        self.bPreHeat.color = (1, 0, 0, 0.9)
-        self.bPreHeat.hovercolor = (1, 0, 0, 0.6)
+        config.buttonArray['preHeat'].color = (
+            config.buttonColour['postClick'][0])
+        config.buttonArray['preHeat'].hovercolor = (
+            config.buttonColour['postClick'][1])
         config.buttonState['PreHeatRun'] = True
 
     def MyTraining(self, event):
-        self.bTraining.color = (1, 0, 0, 0.9)
-        self.bTraining.hovercolor = (1, 0, 0, 0.6)
+        config.buttonArray['Training'].color = (
+            config.buttonColour['postClick'][0])
+        config.buttonArray['Training'].hovercolor = (
+            config.buttonColour['postClick'][1])
         config.buttonState['TrainingRun'] = True
 
     def AboutMe(self, event):

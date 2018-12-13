@@ -12,11 +12,12 @@ There are various buttons on the graph which will start various programs.
 ## To Do List ##
 
 - [ ] Refactor
-  - [ ] change to multiple more manageable files
-  - [ ] flags to set button to false
+  - [x] change to multiple more manageable files
+  - [x] flags to set button to false
   - [ ] Make sure nothing is hardcoded that should be from input variables
 - [ ] add slope and rest time editing in each program, but default to inital values if not supplied
 - [ ] move 'practice' to seperate programme?
+- [ ] change button colours better
 
 ### Done List ###
 

@@ -4,10 +4,12 @@ import numpy as np
 from pathlib import Path
 from sklearn.linear_model import LinearRegression
 import config
-from stopThreadclass import StoppableThread
+from threading import Thread
 
 
-class general(StoppableThread):
+class general(Thread):
+    def __init__(self):
+        Thread.__init__(self)
 
     def json_read(self, data_folder, fileName):
         DataFile = Path(data_folder / (fileName + '.json'))

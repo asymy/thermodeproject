@@ -1,29 +1,17 @@
 def init():
-    global cancelProg
-    global startTime
-    global currentTemp
-    global targetTemp
-    global slope
-    global changeProg
-    global folders
-    global selectedThermode
-    global participantID
-    global currentRating
-    global buttonState
-    global ratingCollected
-    global defaultVals
+    global participantID, folders, defaultVals
+    global startTime, selectedThermode
+    global currentTemp, ratingCollected, currentRating
+    global targetTemp, changeProg
+    global buttonState, cancelProg, text
+    global buttonColour, buttonArray
 
-    cancelProg = False
-    changeProg = False
-    ratingCollected = False
+    cancelProg, changeProg, ratingCollected = False, False, False
 
-    startTime = []
-    currentTemp = []
-    targetTemp = 25.
-    slope = []
-    participantID = []
-    currentRating = []
-    defaultVals = []
+    startTime, currentTemp, targetTemp = [], [], []
+    participantID, currentRating, defaultVals = [], [], []
+
+    text = ''
 
     folders = {
         'calibration': [],
@@ -39,5 +27,9 @@ def init():
         'PreCapRun': False,
         'TrainingRun': False,
         'PreHeatRun': False
-
     }
+    buttonColour = {
+        'postClick': [[1, 0, 0, 0.9], [1, 0, 0, 0.6]],
+        'postRun': [[0, 1, 0, 0.9], [0, 1, 0, 0.6]]
+    }
+    buttonArray = {}
