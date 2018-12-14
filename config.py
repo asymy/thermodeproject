@@ -1,17 +1,41 @@
+from pathlib import Path
+import json
+
+
 def init():
-    global participantID, folders, defaultVals
+    global participantID, folders, defaultVals, thermodeInfo, monitorInfo
     global startTime, selectedThermode
-    global currentTemp, ratingCollected, currentRating
+    global currentTemp, ratingCollected, currentRating, progStatus
     global targetTemp, changeProg
     global buttonState, cancelProg, text
     global buttonColour, buttonArray
+    global monitor, vEEG, vThermode
+    global availaleCOMportsThermode, availaleCOMportsEEG
 
     cancelProg, changeProg, ratingCollected = False, False, False
 
     startTime, currentTemp, targetTemp = [], [], []
     participantID, currentRating, defaultVals = [], [], []
+    vEEG, vThermode = [], []
 
     text = ''
+    monitor = ''
+
+    availaleCOMportsThermode = {
+        'none': False,
+        'COM1': False,
+        'COM4': False,
+        'COM5': False,
+        'COM6': False
+    }
+
+    availaleCOMportsEEG = {
+        'none': False,
+        'COM1': False,
+        'COM4': False,
+        'COM5': False,
+        'COM6': False
+    }
 
     folders = {
         'calibration': [],
@@ -29,7 +53,23 @@ def init():
         'PreHeatRun': False
     }
     buttonColour = {
-        'postClick': [[1, 0, 0, 0.9], [1, 0, 0, 0.6]],
-        'postRun': [[0, 1, 0, 0.9], [0, 1, 0, 0.6]]
+        'preClick': ['mediumorchid', 'plum'],
+        'postClick': ['darkgray', 'darkgray'],
+        'postRun': ['thistle', 'thistle'],
     }
     buttonArray = {}
+    progStatus = {
+        'name': '',
+        'prevTemp': [],
+        'nextTemp': [],
+        'timeLeft': []
+    }
+    thermodeInfo = json_read(Path('CalibrationFiles'), 'thermodeinfo')
+    monitorInfo = json_read(Path('CalibrationFiles'), 'monitorinfo')
+
+
+def json_read(data_folder, fileName):
+    DataFile = Path(data_folder / (fileName + '.json'))
+    with open(DataFile, 'r') as filehandle:
+        data = json.load(filehandle)
+    return data

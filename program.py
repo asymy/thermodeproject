@@ -1,6 +1,5 @@
 import numpy as np
 import time
-import sys
 
 # Personal
 from EEGControl import EEGControl
@@ -20,6 +19,16 @@ EEGControl = EEGControl()
 class MyHeatPainProgramme(StoppableThread):
 
     def __init__(self):
+        config.buttonState = {
+            'PracticeRun': False,
+            'CalibrationRun': False,
+            'HPEEGRun': False,
+            'HPEEGRand1Run': False,
+            'HPEEGRand2Run': False,
+            'PreCapRun': False,
+            'TrainingRun': False,
+            'PreHeatRun': False
+        }
         StoppableThread.__init__(self)
 
         startingVals = gen.json_read(
@@ -67,9 +76,8 @@ class MyHeatPainProgramme(StoppableThread):
         self.setandcheck(baselineTemp)
         T = time.time()
         EEGControl.EEGTrigger(11)
+        config.progStatus['nextTemp'] = noxioustemps[0]
         gen.wait(5)
-        print('\tNext Temperature = ' +
-              str(noxioustemps[0]) + '°C, for ' + str(holdTimes[0]) + 's.')
         gen.timer(T, config.defaultVals['RestTime'])
         EEGControl.EEGTrigger(12)
         for x in range(len(noxioustemps)):
@@ -81,6 +89,7 @@ class MyHeatPainProgramme(StoppableThread):
             self.setandcheck(baselineTemp)
             T = time.time()
             EEGControl.EEGTrigger(11)
+
             gen.wait(5)
             EEGControl.EEGTrigger(15)
             config.ratingCollected = False
@@ -89,13 +98,11 @@ class MyHeatPainProgramme(StoppableThread):
                    config.cancelProg is False):
                 gen.wait(0.05)
             gen.wait(.5)
-            print('\tPain Rating to last Temperature = ' +
-                  str(config.currentRating))
-            gen.wait(.5)
-            if x < len(noxioustemps) - 1:
-                print('\tNext Temperature = ' +
-                      str(noxioustemps[x+1]) + '°C, for ' +
-                      str(holdTimes[x+1]) + 's.')
+            config.progStatus['prevTemp'] = noxioustemps[x]
+            if x < len(noxioustemps):
+                config.progStatus['nextTemp'] = noxioustemps[x+1]
+            else:
+                config.progStatus['nextTemp'] = 'NaN'
             gen.timer(T, config.defaultVals['RestTime'])
             if not config.cancelProg:
                 self.allRatings = np.append(
@@ -111,7 +118,7 @@ class MyHeatPainProgramme(StoppableThread):
                     break
 
     def Practice(self):
-        print('Practice Run')
+        config.progStatus['name'] = 'Practice'
         messages = (('During the stimulation a fixation cross will appear on '
                      'the screen.\nPlease relax, and focus on the cross when '
                      'it is on the screen.\nAn example of the cross is on the '
@@ -139,9 +146,7 @@ class MyHeatPainProgramme(StoppableThread):
                            config.cancelProg is False):
                         gen.wait(0.05)
                     config.ratingCollected = False
-                    print('pain rating: ' + str(config.currentRating))
                     gen.wait(2)
-
         config.text = ''
         config.buttonArray['Practice'].color = (
             config.buttonColour['postRun'][0])
@@ -150,8 +155,7 @@ class MyHeatPainProgramme(StoppableThread):
         self.SetButtonFalse()
 
     def Training(self):
-        print('\n\nTraining')
-
+        config.progStatus['name'] = 'Training'
         trainingData = gen.json_read(
             config.folders['calibration'], 'trainingdata')
         startingTemperature = trainingData['startingTemperature']
@@ -167,7 +171,7 @@ class MyHeatPainProgramme(StoppableThread):
         self.SetButtonFalse()
 
     def PreCapHP(self):
-        print('\n\nPreCapHP')
+        config.progStatus['name'] = 'Pre-Capsaicin'
         preCapData = gen.json_read(config.folders['calibration'], 'precapdata')
         startingTemperature = preCapData['startingTemperature']
         noxioustemps = preCapData['NoxiousTemps']
@@ -189,7 +193,7 @@ class MyHeatPainProgramme(StoppableThread):
         self.SetButtonFalse()
 
     def PreHeat(self):
-        print('\n\nPre-Heat')
+        config.progStatus['name'] = 'Pre-Heat'
         preHeatData = gen.json_read(
             config.folders['calibration'], 'preheatdata')
         noxioustemps = preHeatData['NoxiousTemp']
@@ -203,43 +207,41 @@ class MyHeatPainProgramme(StoppableThread):
         config.text = "Starting Pre-Heat Session"
         self.setandcheck(startingTemp)
         T = time.time()
+        config.progStatus['nextTemp'] = noxioustemps
         gen.timer(T, 10)
         config.text = '+'
         gen.wait(10)
         self.setandcheck(noxioustemps)
         T = time.time()
         endTime = T + holdTimes
-
         time_in_s = holdTimes+2
         currentTime = time.time()
         startTime = currentTime
         endTime = startTime + time_in_s
-        self.timeLeft = endTime - currentTime
+        config.progStatus['prevTemp'] = noxioustemps
+        config.progStatus['nextTemp'] = startingTemp
+        config.progStatus['timeLeft'] = endTime - currentTime
         while currentTime < endTime and config.cancelProg is False:
-            if np.around(self.timeLeft-1, decimals=0) % sample == 0:
+            if np.around(
+                    config.progStatus['timeLeft']-1, decimals=0) % sample == 0:
                 config.ratingCollected = False
                 config.text = 'rt'
                 while (config.ratingCollected is False and
                        config.cancelProg is False):
                     gen.wait(0.05)
                     currentTime = time.time()
-                    self.timeLeft = endTime - currentTime
+                    config.progStatus['timeLeft'] = np.around(
+                        endTime - currentTime, decimals=1)
                 gen.wait(.5)
-                print('\n\tPain Rating to last Temperature = ' +
-                      str(config.currentRating))
+
                 self.allRatings = np.append(
                     self.allRatings, config.currentRating)
             else:
                 gen.wait(0.05)
                 currentTime = time.time()
-                self.timeLeft = endTime - currentTime
-                if np.around(self.timeLeft, decimals=1) % 1 == 0:
-                    txt = ('time left: ' +
-                           str(int(np.around(self.timeLeft, decimals=0))) +
-                           's ')
-                    sys.stdout.write('\r' + txt)
-                    sys.stdout.flush()
 
+                config.progStatus['timeLeft'] = np.around(
+                    endTime - currentTime, decimals=1)
         print('Apply Capsaicin')
         self.setandcheck(startingTemp)
         if len(self.allRatings) is not 0:
@@ -257,7 +259,7 @@ class MyHeatPainProgramme(StoppableThread):
         self.SetButtonFalse()
 
     def Calibration(self):
-        print('\n\nCalibration')
+        config.progStatus['name'] = 'Calibration'
         caliData = gen.json_read(
             config.folders['calibration'], 'calibrationdata')
         nextTemp = caliData['FirstNoxiousTemp']
@@ -277,7 +279,8 @@ class MyHeatPainProgramme(StoppableThread):
         for sample in range(max_samples):
             if not config.cancelProg:
                 noxioustemps = np.append(noxioustemps, nextTemp)
-                print('\tNext Temperature = ' + str(nextTemp) + '°C')
+                config.progStatus['prevTemp'] = noxioustemps[sample-1]
+                config.progStatus['nextTemp'] = nextTemp
                 gen.timer(Tr, config.defaultVals['RestTime'])
                 self.setandcheck(noxioustemps[sample])
                 Tn = time.time()
@@ -294,8 +297,6 @@ class MyHeatPainProgramme(StoppableThread):
             if not config.cancelProg:
                 self.allRatings = np.append(
                     self.allRatings, config.currentRating)
-                print('\tPain Rating to last Temperature = ' +
-                      str(config.currentRating))
                 # not enough samples to perform linear regression
                 if np.sum(self.allRatings) < 3.:  # sample < 2 or
                     if config.currentRating < 1.:
@@ -363,11 +364,14 @@ class MyHeatPainProgramme(StoppableThread):
             config.buttonColour['postRun'][0])
         config.buttonArray['Calibration'].hovercolor = (
             config.buttonColour['postRun'][1])
-        CalibratedPlot_Participant(config.participantID)
+        try:
+            CalibratedPlot_Participant(config.participantID)
+        except FileNotFoundError:
+            print('Unable to plot Calibration graph.')
         self.SetButtonFalse()
 
     def EEGAscend(self):
-        print('\n\nEEGRun')
+        config.progStatus['name'] = 'EEG Ascend'
         try:
             data_folder = config.folders['data']
             fileName = ('EEGAscendTemps_Participant' +
@@ -394,7 +398,6 @@ class MyHeatPainProgramme(StoppableThread):
         self.SetButtonFalse()
 
     def EEGRand(self, num):
-        print('\n\nEEGRun2')
         data_folder = config.folders['data']
         fileName = ('EEGRandTemps_Participant' +
                     config.participantID)
@@ -404,9 +407,11 @@ class MyHeatPainProgramme(StoppableThread):
         if num == 1:
             index = [2, 4, 8, 0, 6]
             config.text = "Starting EEG Run 2"
+            config.progStatus['name'] = 'EEG Rand 1'
         elif num == 2:
             index = [1, 3, 5, 7, 9, 10]
             config.text = "Starting EEG Run 3"
+            config.progStatus['name'] = 'EEG Rand 2'
         noxioustemps = np.zeros_like(index, dtype=float)
         holdTimes = np.zeros_like(index)
         for x in range(len(index)):
@@ -438,6 +443,7 @@ class MyHeatPainProgramme(StoppableThread):
         config.targetTemp = config.defaultVals['baselineTemperature']
         config.changeProg = True
         config.text = ''
+        config.currentRating = []
         self.allRatings = []
         config.buttonState = {
             'PracticeRun': False,
@@ -450,8 +456,13 @@ class MyHeatPainProgramme(StoppableThread):
             'PreHeatRun': False
 
         }
+        config.progStatus = {
+            'name': '',
+            'prevTemp': [],
+            'nextTemp': [],
+            'timeLeft': []
+        }
         config.cancelProg = False
-        print('Finished\n\n')
 
     def setandcheck(self, temp):
         if not config.cancelProg:

@@ -3,4 +3,4 @@ class MyDataClass():
     def __init__(self):
 
         self.XData = [0]
-        self.YData = [37]
+        self.YData = [0]

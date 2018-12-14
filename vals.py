@@ -10,25 +10,27 @@ def json_write(data, namelist):
 
 
 def initialise_thermodes():
-    thermode_v5 = {
+    thermodeInfo = [{
+        'name': 'thermode_v5',
         'OffSetTemp_DA': 366,
         'ScaleFactorTemp_DA': 45.8,
         'OffSetSlope_DA': -48,
         'ScaleFactorSlope_DA': 437,
         'OffSetTemp_AD': 27,
         'ScaleFactorTemp_AD': 69.1
-    }
-    json_write(thermode_v5, 'RegularThermode_v5')
-
-    thermode_fMRI = {
+    }, {
+        'name': 'thermode_fMRI',
         'OffSetTemp_DA': 420,
         'ScaleFactorTemp_DA': 45.0,
         'OffSetSlope_DA': -66,
         'ScaleFactorSlope_DA': 437,
         'OffSetTemp_AD': 92,
         'ScaleFactorTemp_AD': 68.6
-    }
-    json_write(thermode_fMRI, 'fMRIThermode')
+    }]
+    json_write(thermodeInfo, 'thermodeInfo')
+
+
+initialise_thermodes()
 
 
 def initialise_vals():
@@ -87,6 +89,3 @@ def initialise_vals():
 def initialise():
     initialise_thermodes()
     initialise_vals()
-
-
-initialise()

@@ -16,70 +16,135 @@ EEGControl = EEGControl()
 gen = general()
 
 
+def write_to_axes(ax, txt, pos):
+    return ax.text(pos[0], pos[1], txt,
+                   horizontalalignment='left',
+                   verticalalignment='center',
+                   transform=ax.transAxes,
+                   fontsize=18)
+
+
+def create_info_box(ax, pos):
+    boxInfo = dict(
+        facecolor='snow',
+        edgecolor='black',
+        boxstyle='round,pad=0.3')
+    return ax.text(pos[0], pos[1], '',
+                   horizontalalignment='center',
+                   verticalalignment='bottom',
+                   transform=ax.transAxes,
+                   fontsize=18,
+                   bbox=boxInfo)
+
+
 class MyPresentation():
 
     def __init__(self, dataClass):
         # GRAPH
         self._dataClass = dataClass
         self.fig, self.ax = plt.subplots()
-        self.fig.canvas.set_window_title('Thermode Heat Pain EEG')
-        plt.subplots_adjust(bottom=0.2)
+        plt.subplots_adjust(left=0.2, bottom=0.23)
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
+        plt.title('Temperature of Thermode', fontsize=20)
+        self.fig.patch.set_facecolor('snow')
+        self.fig.set_size_inches(20, 10)
+        self.fig.canvas.set_window_title('Thermode Heat Pain EEG')
         self.hLine, = plt.plot(0, 0, 'g')
-        self.ax.axes.grid()
-        self.fig.set_size_inches(17, 10)
+        self.hLine.set_color('b')
         self.ani = FuncAnimation(self.fig, self.run, interval=10, repeat=True)
         self.ax.axes.set_ylim(19, 51)
         self.ax.axes.set_ylabel('Temperature (°C)', fontsize=16)
         self.ax.axes.set_xlabel('Time (s)', fontsize=16)
-        self.hLine.set_color('b')
+        self.ax.axes.grid()
 
         # Buttons
-
         def createButton(pos, text, function):
             axB = plt.axes(pos)
             button = Button(axB, text)
             button.label.set_fontsize(14)
             button.on_clicked(function)
+            button.color = config.buttonColour['preClick'][0]
+            button.hovercolor = config.buttonColour['preClick'][1]
             return button
 
-        delta = 0.10
-        a, b, c, d = 0.86, 0.05, 0.09, 0.06
+        delta = 0.08
+        a, b, c, d = 0.02, 0.1, 0.1, 0.06
         config.buttonArray['Cancel'] = createButton(
             [a, b, c, d], 'Cancel', self.MyCancel)
-        a = a-delta
+        config.buttonArray['Cancel'].color = 'orangered'
+        config.buttonArray['Cancel'].hovercolor = 'lightsalmon'
+        b = b+delta+0.07
         config.buttonArray['EEGRand2'] = createButton(
             [a, b, c, d], 'EEG Rand 2', self.MyEEGRand2)
-        a = a-delta
+        b = b+delta
         config.buttonArray['EEGRand1'] = createButton(
             [a, b, c, d], 'EEG Rand 1', self.MyEEGRand1)
-        a = a-delta
+        b = b+delta
         config.buttonArray['EEGAscend'] = createButton(
             [a, b, c, d], 'EEG Ascending', self.MyEEGAscend)
-        a = a-delta
+        b = b+delta
         config.buttonArray['Calibration'] = createButton(
             [a, b, c, d], 'Calibration', self.MyCali)
-        a = a-delta
+        b = b+delta
         config.buttonArray['preHeat'] = createButton(
             [a, b, c, d], 'Pre Heat', self.MyPreHeat)
-        a = a-delta
+        b = b+delta
         config.buttonArray['PreCap'] = createButton(
             [a, b, c, d], 'Pre Cap', self.MyPreCap)
-        a = a-delta
+        b = b+delta
         config.buttonArray['Training'] = createButton(
             [a, b, c, d], 'Training', self.MyTraining)
-        a = a-delta
+        b = b+delta
         config.buttonArray['Practice'] = createButton(
             [a, b, c, d], 'Practice', self.MyPractice)
-        b = 0.91
-        config.buttonArray['About'] = createButton(
-            [0.07, b, c, d], 'About', self.AboutMe)
+        a, b, c = 0.93, 0.91, 0.05
         config.buttonArray['Quit'] = createButton(
-            [0.85, b, c, d], 'Quit', self.MyQuit)
+            [a, b, c, d], 'Quit', self.MyQuit)
+        config.buttonArray['Quit'].color = 'orangered'
+        config.buttonArray['Quit'].hovercolor = 'lightsalmon'
+        a = a-0.06
+        config.buttonArray['About'] = createButton(
+            [a, b, c, d], 'About', self.AboutMe)
+        config.buttonArray['About'].color = 'mediumturquoise'
+        config.buttonArray['About'].hovercolor = 'paleturquoise'
+
+        tax = plt.axes([0.2, 0.02, 0.7, 0.13], facecolor='floralwhite')
+        tax.get_xaxis().set_visible(False)
+        tax.get_yaxis().set_visible(False)
+
+        x1, x2, x3 = 0.02, 0.43, 0.75
+        y1, y2 = 0.73, 0.35
+        txt = 'Programme Running:'
+        write_to_axes(tax, txt, [x1, y1])
+
+        txt = 'Current Temperature:'
+        write_to_axes(tax, txt, [x1, y2])
+
+        txt = 'Previous Temp:'
+        write_to_axes(tax, txt, [x2, y1])
+
+        txt = 'Pain Rating:'
+        write_to_axes(tax, txt, [x2, y2])
+
+        txt = 'Next Temp:'
+        write_to_axes(tax, txt, [x3, y1])
+
+        txt = 'Time to Next:'
+        write_to_axes(tax, txt, [x3, y2])
+
+        x1, x2, x3 = 0.31, 0.63, 0.93
+        y1, y2 = 0.65, 0.25
+        self.infoCurrentProgramme = create_info_box(tax, [x1, y1])
+        self.infoCurrentProgramme.set_text('None')
+        self.infoCurrentTemp = create_info_box(tax, [x1, y2])
+        self.infoPreviousTemp = create_info_box(tax, [x2, y1])
+        self.infoPainRating = create_info_box(tax, [x2, y2])
+        self.infoNextTemp = create_info_box(tax, [x3, y1])
+        self.infoTimeToNext = create_info_box(tax, [x3, y2])
 
         # PSYCHOPY
-        self.mon = monitors.Monitor(name='Lonovo')
+        self.mon = monitors.Monitor(name=config.monitor)
         self.win = visual.Window(fullscr=True,
                                  size=self.mon.getSizePix(),
                                  screen=1,
@@ -125,8 +190,29 @@ class MyPresentation():
         self.hLine.set_data(self._dataClass.XData, self._dataClass.YData)
         self.hLine.axes.set_xlim(
             np.max(self._dataClass.XData)-60, np.max(self._dataClass.XData))
-        self.ax.legend([str(config.currentTemp)], loc='upper left',
-                       fontsize=18)
+        self.infoCurrentTemp.set_text(
+            str(config.currentTemp) + '°C')
+        changeDisp = False
+        for x in config.buttonState:
+            if config.buttonState[x]:
+                changeDisp = True
+        if changeDisp:
+            self.infoCurrentProgramme.set_text(config.progStatus['name'])
+            self.infoPreviousTemp.set_text(
+                (str(config.progStatus['prevTemp']) + '°C'))
+            self.infoPainRating.set_text(
+                (str(config.currentRating) + ' /10'))
+            self.infoNextTemp.set_text(
+                (str(config.progStatus['nextTemp']) + '°C'))
+            self.infoTimeToNext.set_text(
+                (str(config.progStatus['timeLeft']) + 's'))
+
+        else:
+            self.infoCurrentProgramme.set_text('None')
+            self.infoPreviousTemp.set_text('')
+            self.infoPainRating.set_text('')
+            self.infoNextTemp.set_text((''))
+            self.infoTimeToNext.set_text((''))
 
         # PSYCHOPY
         if config.text == '+':

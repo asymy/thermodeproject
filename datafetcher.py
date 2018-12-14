@@ -25,8 +25,9 @@ class MyDataFetchClass(StoppableThread):
         self.ser.timeout = 5
         self.ser.open()
 
-        Thermode = gen.json_read(
-            config.folders['calibration'], config.selectedThermode)
+        for x in range(len(config.thermodeInfo)):
+            if config.thermodeInfo[x]['name'] == config.selectedThermode:
+                Thermode = config.thermodeInfo[x]
 
         offset0 = 'G' + gen.num2hex(float(Thermode['OffSetTemp_DA']))
         gain0 = 'H' + gen.num2hex(float(Thermode['ScaleFactorTemp_DA'])*10)
@@ -52,6 +53,7 @@ class MyDataFetchClass(StoppableThread):
             sys.exit()
 
         config.startTime = time.time()
+        self._dataClass.YData[0] = self.poll_temp()
 
     def poll_temp(self):
         self.ser.write(str.encode('M000'))
