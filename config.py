@@ -1,6 +1,6 @@
 from pathlib import Path
 import json
-
+import sys
 
 def init():
     global participantID, folders, defaultVals, thermodeInfo, monitorInfo
@@ -20,14 +20,19 @@ def init():
 
     text = ''
     monitor = ''
-
-    availaleCOMportsThermode = {
-        'none': False,
-        'COM1': False,
-        'COM4': False,
-        'COM5': False,
-        'COM6': False
-    }
+    if sys.platform == 'win32':
+        availaleCOMportsThermode = {
+            'none': False,
+            'COM1': False,
+            'COM4': False,
+            'COM5': False,
+            'COM6': False
+        }
+    elif sys.platform == 'linux':
+        availaleCOMportsThermode = {
+            'none': False,
+            '/dev/ttyUSB0': False
+        }
 
     availaleCOMportsEEG = {
         'none': False,
