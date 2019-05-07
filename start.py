@@ -77,7 +77,7 @@ def setup():
             ThermButtonContainer.pack(side=tk.RIGHT)
 
             vT = tk.StringVar()
-            inital = 'COM4'
+            inital = 'none'
             vT.set(inital)
             on_selected_thermode(inital)
 
