@@ -10,6 +10,12 @@ from stopThreadclass import StoppableThread
 gen = general()
 
 
+def comportselector():
+    for name, state in config.availaleCOMportsThermode.items():
+        if state:
+            return name
+
+
 class MyDataFetchClass(StoppableThread):
 
     def __init__(self, dataClass):
@@ -17,7 +23,7 @@ class MyDataFetchClass(StoppableThread):
         StoppableThread.__init__(self)
         self.ser = serial.Serial()
         self.ser.baudrate = 9600
-        self.ser.port = 'COM4'
+        self.ser.port = comportselector()
         self.ser.parity = 'N'
         self.ser.bytesize = 8
         self.ser.stopbits = 1

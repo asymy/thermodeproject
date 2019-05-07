@@ -35,8 +35,11 @@ def setup():
     def COMDialog():
 
         def draw_EEG():
-            global vE
-            vE.set('none')
+
+            vE = tk.StringVar()
+            inital = 'none'
+            vE.set(inital)
+            on_selected_EEG(inital)
 
             middleContainerW = tk.Frame(
                 selectorContainer, borderwidth=1, bg=lightColour)
@@ -60,7 +63,6 @@ def setup():
                 rbEEG.pack(anchor=tk.W)
 
         def draw_thermode():
-            global vT
 
             topContainerW = tk.Frame(
                 selectorContainer, borderwidth=1, bg=lightColour)
@@ -73,6 +75,12 @@ def setup():
             thermodeLabel.pack(side=tk.LEFT, anchor=tk.N)
             ThermButtonContainer = tk.Frame(topContainerW, bg=lightColour)
             ThermButtonContainer.pack(side=tk.RIGHT)
+
+            vT = tk.StringVar()
+            inital = 'COM4'
+            vT.set(inital)
+            on_selected_thermode(inital)
+
             for portT in config.availaleCOMportsThermode:
                 rbTherm = tk.Radiobutton(ThermButtonContainer,
                                          text=portT,
@@ -127,6 +135,7 @@ def setup():
         config.monitor = selected
 
     root = tk.Tk()
+
     root.geometry('500x400')
     lightColour = 'SkyBlue1'
     defaultBGColour = 'LightSkyBlue1'
@@ -269,14 +278,5 @@ def setup():
                      width=defaultWidth,
                      command=COMDialog)
     bCOM.pack(side=tk.LEFT, padx=20, pady=5)
-
-    vT = tk.StringVar()
-    inital = 'COM4'
-    on_selected_thermode(inital)
-    vT.set(inital)
-    vE = tk.StringVar()
-    inital = 'none'
-    on_selected_EEG(inital)
-    vT.set(inital)
 
     tk.mainloop()

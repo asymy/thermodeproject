@@ -89,7 +89,6 @@ class MyHeatPainProgramme(StoppableThread):
             self.setandcheck(baselineTemp)
             T = time.time()
             EEGControl.EEGTrigger(11)
-
             gen.wait(5)
             EEGControl.EEGTrigger(15)
             config.ratingCollected = False
