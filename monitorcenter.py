@@ -38,7 +38,15 @@ mon3.setDistance(50)
 mon3.setSizePix((1920, 1200))
 mon3.saveMon()
 
+# viewpix Monitor
 
-monitorInfo = [mon3.name, mon2.name, mon1.name]
+mon4 = monitors.Monitor(name='viewpix')
+mon4.setWidth(51)
+mon4.setDistance(50)
+mon4.setSizePix((1920, 1080))
+mon4.saveMon()
+
+
+monitorInfo = [mon4.name, mon3.name, mon2.name, mon1.name]
 
 json_write(Path('CalibrationFiles'), monitorInfo, 'monitorinfo')

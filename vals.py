@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-calibration_folder = Path('E:/ThermodeProject/CalibrationFiles')
+calibration_folder = Path('./CalibrationFiles')
 
 
 def json_write(data, namelist):
@@ -58,6 +58,7 @@ def initialise_vals():
     precapdata = {
         'startingTemperature': 38.,
         'NoxiousTemps': (43., 44., 45., 46., 47., 48., 49., 50.),
+        # 'NoxiousTemps': (43., 44.),
         'Slope': 5.,
         'RestTime': 30.,
         'HoldTime': 5.,

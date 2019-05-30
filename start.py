@@ -17,7 +17,7 @@ def setup():
             config.folders['data'] = Path(
                 'ParticipantFiles/Participant_' + config.participantID)
             config.folders['calibration'] = Path(
-                'E:/ThermodeProject/CalibrationFiles')
+                './CalibrationFiles')
             config.folders['log'] = Path('logs')
             config.folders['data'].mkdir(parents=True, exist_ok=True)
             root.destroy()
@@ -145,7 +145,7 @@ def setup():
     defaultWidth = 13
     root.configure(background=defaultBGColour)
     root.option_add("*Font", "Helvetica, 12")
-    root.wm_iconbitmap('PainScaleicon.ico')
+    # root.wm_iconbitmap('PainScaleicon.ico')
     root.title('Set Up')
 
     # top label

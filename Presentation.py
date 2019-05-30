@@ -150,20 +150,21 @@ class MyPresentation():
                                  screen=1,
                                  monitor=self.mon)
         self.mes = visual.TextStim(self.win, text='')
+	# self.mes.setSize(12)
         self.mes.height = .05
         self.mes.setAutoDraw(True)  # automatically draw every frame
         self.win.flip()
         config.text = ''
         self.fixation = visual.ShapeStim(self.win,
-                                         units='cm',
-                                         vertices=((0, -.25),
-                                                   (0,  .25),
-                                                   (0,    0),
-                                                   (-.25,    0),
-                                                   (.25,    0)),
-                                         lineWidth=2,
-                                         closeShape=False,
-                                         lineColor="white")
+                            units='cm',
+                            vertices=((0, -.75),
+                                    (0,  .75),
+                                    (0,    0),
+                                    (-.75,    0),
+                                    (.75,    0)),
+                            lineWidth=4,
+                            closeShape=False,
+                            lineColor="white")
         self.myRatingScale = visual.RatingScale(
             self.win, low=0, high=20,
             marker='triangle', stretch=1.5,

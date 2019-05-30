@@ -98,7 +98,7 @@ class MyHeatPainProgramme(StoppableThread):
                 gen.wait(0.05)
             gen.wait(.5)
             config.progStatus['prevTemp'] = noxioustemps[x]
-            if x < len(noxioustemps):
+            if x < len(noxioustemps)-1:
                 config.progStatus['nextTemp'] = noxioustemps[x+1]
             else:
                 config.progStatus['nextTemp'] = 'NaN'
@@ -110,10 +110,10 @@ class MyHeatPainProgramme(StoppableThread):
             else:
                 break
             if not self.EEG:
-                if config.currentRating > 8:
+                if config.currentRating >= 8:
                     break
             elif self.EEG:
-                if config.currentRating > 9:
+                if config.currentRating > 8:
                     break
 
     def Practice(self):
@@ -136,7 +136,7 @@ class MyHeatPainProgramme(StoppableThread):
         for x in range(len(messages)):
             if not config.cancelProg:
                 config.text = messages[x]
-                gen.wait(2)
+                gen.wait(10)
                 config.text = stim[x]
                 if x == 0:
                     gen.wait(2)
@@ -180,7 +180,7 @@ class MyHeatPainProgramme(StoppableThread):
         if len(self.allRatings) is not 0:
             data = {
                 'noxioustemps': noxioustemps,
-                'painRatings': self.allRatings
+                'painRatings': self.allRatings.tolist()
             }
             fileName = ('PreCapPainRatings' + '_Participant' +
                         config.participantID)
@@ -245,7 +245,7 @@ class MyHeatPainProgramme(StoppableThread):
         self.setandcheck(startingTemp)
         if len(self.allRatings) is not 0:
             data = {
-                'painRating': self.allRatings
+                'painRating': self.allRatings.tolist()
             }
             fileName = ('PreHeatRatings_Participant' +
                         config.participantID)
@@ -330,8 +330,8 @@ class MyHeatPainProgramme(StoppableThread):
                     nextTemp = 50.0
         if len(self.allRatings) is not 0:
             data = {
-                'noxioustemps': noxioustemps,
-                'painRatings': self.allRatings
+                'noxioustemps': noxioustemps.tolist(),
+                'painRatings': self.allRatings.tolist()
             }
             fileName = ('CalibratedResults_Participant' +
                         config.participantID)
@@ -351,8 +351,8 @@ class MyHeatPainProgramme(StoppableThread):
             newTempsRand[i[0]] = 50.
 
             data = {
-                'EEGAscendTemps': newTempsAscend,
-                'EEGRandTemps': newTempsRand
+                'EEGAscendTemps': newTempsAscend.tolist(),
+                'EEGRandTemps': newTempsRand.tolist()
             }
             fileName = ('EEGTemps_Participant' +
                         config.participantID)
@@ -373,10 +373,11 @@ class MyHeatPainProgramme(StoppableThread):
         config.progStatus['name'] = 'EEG Ascend'
         try:
             data_folder = config.folders['data']
-            fileName = ('EEGAscendTemps_Participant' +
+            fileName = ('EEGTemps_Participant' +
                         config.participantID)
-            noxioustemps = gen.json_read(data_folder, fileName)
-
+            EEGtemps = gen.json_read(data_folder, fileName)
+            noxioustemps = EEGtemps['EEGAscendTemps']
+            # noxioustemps = [31.0, 32.0, 32.5, 33.0, 33.5, 34, 34.5, 35.0]
             baselineTemp = 25
             holdTimes = np.linspace(45, 10, len(noxioustemps))
             config.text = "Starting EEG Run 1"
@@ -385,8 +386,12 @@ class MyHeatPainProgramme(StoppableThread):
             if len(self.allRatings) is not 0:
                 fileName = ('EEGRun1PainRatings_Participant' +
                             config.participantID)
-                file_to_open = config.folders['data'] / fileName
-                gen.json_write(file_to_open, self.allRatings, fileName)
+                file_to_open = config.folders['data']
+                gen.json_write(
+                    file_to_open,
+                    self.allRatings.tolist(),
+                    fileName
+                    )
             self.SetButtonFalse()
         except FileNotFoundError as fnf_error:
             print(fnf_error)
@@ -398,9 +403,10 @@ class MyHeatPainProgramme(StoppableThread):
 
     def EEGRand(self, num):
         data_folder = config.folders['data']
-        fileName = ('EEGRandTemps_Participant' +
+        fileName = ('EEGTemps_Participant' +
                     config.participantID)
-        temps = gen.json_read(data_folder, fileName)
+        EEGtemps = gen.json_read(data_folder, fileName)
+        temps = EEGtemps['EEGRandTemps']
         baselineTemp = 25
         Times = np.linspace(60, 10, len(temps))
         if num == 1:
@@ -420,17 +426,22 @@ class MyHeatPainProgramme(StoppableThread):
 
         self.EEG = True
         self.HeatPainRun(baselineTemp, noxioustemps, holdTimes)
-        if len(self.allRatings) is not 0:
-            fileName = ('EEGRand1PainRatings_Participant' +
-                        config.participantID)
-            file_to_open = config.folders['data'] / fileName
-            gen.json_write(file_to_open, self.allRatings, fileName)
         if num == 1:
+            if len(self.allRatings) is not 0:
+                fileName = ('EEGRand1PainRatings_Participant' +
+                            config.participantID)
+                file_to_open = config.folders['data']
+                gen.json_write(file_to_open, self.allRatings.tolist(), fileName)
             config.buttonArray['EEGRand1'].color = (
                 config.buttonColour['postRun'][0])
             config.buttonArray['EEGRand1'].hovercolor = (
                 config.buttonColour['postRun'][1])
         elif num == 2:
+            if len(self.allRatings) is not 0:
+                fileName = ('EEGRand2PainRatings_Participant' +
+                            config.participantID)
+                file_to_open = config.folders['data']
+                gen.json_write(file_to_open, self.allRatings.tolist(), fileName)
             config.buttonArray['EEGRand2'].color = (
                 config.buttonColour['postRun'][0])
             config.buttonArray['EEGRand2'].hovercolor = (

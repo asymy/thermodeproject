@@ -2,7 +2,9 @@ from pathlib import Path
 import json
 import sys
 
+
 def init():
+
     global participantID, folders, defaultVals, thermodeInfo, monitorInfo
     global startTime, selectedThermode
     global currentTemp, ratingCollected, currentRating, progStatus

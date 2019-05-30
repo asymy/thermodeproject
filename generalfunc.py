@@ -72,7 +72,7 @@ class general(Thread):
 
     def findmissingvals(self, painRatings):
         for r in reversed(range(9)):
-            i = np.where((painRatings >= r-0.5) & (painRatings < r+0.5))
+            i = np.where((painRatings >= r-0.5) & (painRatings <= r+0.5))
             a = list(i[0])
             if not a:
                 print('\ttarget rating: ' + str(r))
