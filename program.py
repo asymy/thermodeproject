@@ -300,11 +300,7 @@ class MyHeatPainProgramme(StoppableThread):
                 if np.sum(self.allRatings) < 3.:  # sample < 2 or
                     if config.currentRating < 1.:
                         nextTemp = noxioustemps[sample] + 3
-<<<<<<< HEAD
                     elif config.currentRating <= 3.:
-=======
-                    elif config.currentRating < 3.:
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
                         nextTemp = noxioustemps[sample] + 1
                     elif (config.currentRating >= 3. and
                           config.currentRating < 8.):
@@ -313,11 +309,7 @@ class MyHeatPainProgramme(StoppableThread):
                         nextTemp = noxioustemps[sample] - 2
                 else:
                     if config.currentRating < 8. and sequence:
-<<<<<<< HEAD
                         targetRating = config.currentRating+1
-=======
-                        targetRating = config.currentRating+0.8
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
                         if targetRating > 8:
                             targetRating = 8.
                         nextTemp = gen.predict_val(
@@ -352,11 +344,7 @@ class MyHeatPainProgramme(StoppableThread):
             newTempsAscend[i[0]] = 50.
 
             targetRating = np.array(
-<<<<<<< HEAD
                 [1., 2., 3., 4., 5., 6., 6.5, 7., 7.5, 8., 8.])
-=======
-                [1, 1.7, 2.4, 3.1, 3.8, 4.5, 5.2, 5.9, 6.6, 7.3, 8])
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
             newTempsRand = np.around(gen.make_model(
                 self.allRatings, noxioustemps, targetRating), decimals=1)
             i = np.where(newTempsRand > 50.)
@@ -391,7 +379,6 @@ class MyHeatPainProgramme(StoppableThread):
             noxioustemps = EEGtemps['EEGAscendTemps']
             # noxioustemps = [31.0, 32.0, 32.5, 33.0, 33.5, 34, 34.5, 35.0]
             baselineTemp = 25
-<<<<<<< HEAD
             holdTimes = np.linspace(10, 10, len(noxioustemps))
             config.text = "Starting EEG Run 1"
 
@@ -404,10 +391,6 @@ class MyHeatPainProgramme(StoppableThread):
             gen.timer(T, 60)  # pre-heat period of one minute
             self.setandcheck(baselineTemp)
 
-=======
-            holdTimes = np.linspace(45, 10, len(noxioustemps))
-            config.text = "Starting EEG Run 1"
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
             self.EEG = True
             self.HeatPainRun(baselineTemp, noxioustemps, holdTimes)
             if len(self.allRatings) is not 0:
@@ -435,7 +418,6 @@ class MyHeatPainProgramme(StoppableThread):
         EEGtemps = gen.json_read(data_folder, fileName)
         temps = EEGtemps['EEGRandTemps']
         baselineTemp = 25
-<<<<<<< HEAD
         Times = np.linspace(10, 10, len(temps))
         if num == 1:
             index = [4, 7, 8, 0, 6, 10, 3, 1, 5, 9, 2]
@@ -443,15 +425,6 @@ class MyHeatPainProgramme(StoppableThread):
             config.progStatus['name'] = 'EEG Rand 1'
         elif num == 2:
             index = [5, 8, 10, 0, 4, 6, 9, 2, 1, 3, 7]
-=======
-        Times = np.linspace(60, 10, len(temps))
-        if num == 1:
-            index = [2, 4, 8, 0, 6]
-            config.text = "Starting EEG Run 2"
-            config.progStatus['name'] = 'EEG Rand 1'
-        elif num == 2:
-            index = [1, 3, 5, 7, 9, 10]
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
             config.text = "Starting EEG Run 3"
             config.progStatus['name'] = 'EEG Rand 2'
         noxioustemps = np.zeros_like(index, dtype=float)
@@ -461,7 +434,6 @@ class MyHeatPainProgramme(StoppableThread):
             noxioustemps[x] = np.around(temps[i], decimals=1)
             holdTimes[x] = Times[i]
 
-<<<<<<< HEAD
         preheattemp = temps[3]  # should be pain rating of 4
         config.text = '+'
         gen.wait(5)
@@ -471,8 +443,6 @@ class MyHeatPainProgramme(StoppableThread):
         gen.timer(T, 60)  # pre-heat period of one minute
         self.setandcheck(baselineTemp)
 
-=======
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
         self.EEG = True
         self.HeatPainRun(baselineTemp, noxioustemps, holdTimes)
         if num == 1:
@@ -480,15 +450,11 @@ class MyHeatPainProgramme(StoppableThread):
                 fileName = ('EEGRand1PainRatings_Participant' +
                             config.participantID)
                 file_to_open = config.folders['data']
-<<<<<<< HEAD
                 gen.json_write(
                     file_to_open,
                     self.allRatings.tolist(),
                     fileName
                     )
-=======
-                gen.json_write(file_to_open, self.allRatings.tolist(), fileName)
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
             config.buttonArray['EEGRand1'].color = (
                 config.buttonColour['postRun'][0])
             config.buttonArray['EEGRand1'].hovercolor = (
@@ -498,15 +464,11 @@ class MyHeatPainProgramme(StoppableThread):
                 fileName = ('EEGRand2PainRatings_Participant' +
                             config.participantID)
                 file_to_open = config.folders['data']
-<<<<<<< HEAD
                 gen.json_write(
                     file_to_open,
                     self.allRatings.tolist(),
                     fileName
                     )
-=======
-                gen.json_write(file_to_open, self.allRatings.tolist(), fileName)
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
             config.buttonArray['EEGRand2'].color = (
                 config.buttonColour['postRun'][0])
             config.buttonArray['EEGRand2'].hovercolor = (

@@ -27,46 +27,8 @@ def setup():
             config.availaleCOMportsThermode, False)
         config.availaleCOMportsThermode[port] = True
 
-<<<<<<< HEAD
     def COMDialog():
 
-=======
-    def on_selected_EEG(port):
-        config.availaleCOMportsEEG = dict.fromkeys(
-            config.availaleCOMportsEEG, False)
-        config.availaleCOMportsEEG[port] = True
-
-    def COMDialog():
-
-        def draw_EEG():
-
-            vE = tk.StringVar()
-            inital = 'none'
-            vE.set(inital)
-            on_selected_EEG(inital)
-
-            middleContainerW = tk.Frame(
-                selectorContainer, borderwidth=1, bg=lightColour)
-            middleContainerW.pack(side=tk.LEFT, expand=True)
-            EEGLabel = tk.Label(middleContainerW,
-                                text='EEG:',
-                                bg=lightColour,
-                                width=defaultWidth,
-                                pady=5, padx=5)
-            EEGLabel.pack(side=tk.LEFT, anchor=tk.N)
-            EEGButtonContainer = tk.Frame(middleContainerW, bg=lightColour)
-            EEGButtonContainer.pack(side=tk.RIGHT)
-
-            for portE in config.availaleCOMportsEEG:
-                rbEEG = tk.Radiobutton(EEGButtonContainer,
-                                       text=portE,
-                                       variable=vE,
-                                       value=portE,
-                                       bg=lightColour,
-                                       command=lambda portE=portE: on_selected_EEG(portE))
-                rbEEG.pack(anchor=tk.W)
-
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
         def draw_thermode():
 
             topContainerW = tk.Frame(
@@ -116,11 +78,6 @@ def setup():
         selectorContainer = tk.Frame(window, bg=defaultBGColour)
         selectorContainer.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-<<<<<<< HEAD
-=======
-        draw_EEG()
-
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
         draw_thermode()
 
         bottomContainerW = tk.Frame(window, borderwidth=1, bg=defaultBGColour)
@@ -142,11 +99,8 @@ def setup():
         monitorInfoDisplay.set(selected)
         config.monitor = selected
 
-<<<<<<< HEAD
     
 
-=======
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
     root = tk.Tk()
 
     root.geometry('500x400')
@@ -292,10 +246,7 @@ def setup():
                      command=COMDialog)
     bCOM.pack(side=tk.LEFT, padx=20, pady=5)
 
-<<<<<<< HEAD
     selectMonitor('ViewPix')
     selectThermode('thermode_v5')
 
-=======
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
     tk.mainloop()

@@ -33,24 +33,10 @@ def init():
     elif sys.platform == 'linux':
         availaleCOMportsThermode = {
             'none': False,
-<<<<<<< HEAD
             '/dev/ttyUSB0': True,
             '/dev/ttyUSB1': False
         }
 
-=======
-            '/dev/ttyUSB0': False
-        }
-
-    availaleCOMportsEEG = {
-        'none': False,
-        'COM1': False,
-        'COM4': False,
-        'COM5': False,
-        'COM6': False
-    }
-
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
     folders = {
         'calibration': [],
         'data': [],

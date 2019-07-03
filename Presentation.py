@@ -150,17 +150,12 @@ class MyPresentation():
                                  screen=1,
                                  monitor=self.mon)
         self.mes = visual.TextStim(self.win, text='')
-<<<<<<< HEAD
         # self.mes.setSize(12)
-=======
-	# self.mes.setSize(12)
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
         self.mes.height = .05
         self.mes.setAutoDraw(True)  # automatically draw every frame
         self.win.flip()
         config.text = ''
         self.fixation = visual.ShapeStim(self.win,
-<<<<<<< HEAD
                                          units='cm',
                                          vertices=((0, -.75),
                                                    (0,  .75),
@@ -170,17 +165,6 @@ class MyPresentation():
                                          lineWidth=4,
                                          closeShape=False,
                                          lineColor="white")
-=======
-                            units='cm',
-                            vertices=((0, -.75),
-                                    (0,  .75),
-                                    (0,    0),
-                                    (-.75,    0),
-                                    (.75,    0)),
-                            lineWidth=4,
-                            closeShape=False,
-                            lineColor="white")
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
         self.myRatingScale = visual.RatingScale(
             self.win, low=0, high=20,
             marker='triangle', stretch=1.5,
@@ -258,11 +242,7 @@ class MyPresentation():
     def MyQuit(self, event):
         config.cancelProg = True
         name = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-<<<<<<< HEAD
         fileName = (name + '_Participant' + config.participantID)
-=======
-        fileName = (name + '_Participant' + config.participantID + '.json')
->>>>>>> 825cad075484cb5a40c9a368a4f7f0d25f245b1a
         data = {
             'time': self._dataClass.XData,
             'temp': self._dataClass.YData
