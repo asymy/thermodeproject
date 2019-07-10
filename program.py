@@ -506,7 +506,7 @@ class MyHeatPainProgramme(StoppableThread):
             config.targetTemp = temp
             config.changeProg = True
             while (config.currentTemp >=
-                   (config.targetTemp + config.defaultVals['tolerance'])
-                   or config.currentTemp <=
+                   (config.targetTemp + config.defaultVals['tolerance']) or
+                   config.currentTemp <=
                    (config.targetTemp - config.defaultVals['tolerance'])):
                 gen.wait(0.1)

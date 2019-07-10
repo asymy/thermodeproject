@@ -54,7 +54,8 @@ def setup():
                                          value=portT,
                                          variable=vT,
                                          bg=lightColour,
-                                         command=lambda portT=portT: on_selected_thermode(portT))
+                                         command=lambda portT=portT:
+                                         on_selected_thermode(portT))
                 rbTherm.pack(anchor=tk.W)
 
         window = tk.Toplevel(root)
@@ -98,8 +99,6 @@ def setup():
     def selectMonitor(selected):
         monitorInfoDisplay.set(selected)
         config.monitor = selected
-
-    
 
     root = tk.Tk()
 
