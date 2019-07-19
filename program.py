@@ -297,7 +297,7 @@ class MyHeatPainProgramme(StoppableThread):
                 self.allRatings = np.append(
                     self.allRatings, config.currentRating)
                 # not enough samples to perform linear regression
-                if np.sum(self.allRatings) < 3.:  # sample < 2 or
+                if len(self.allRatings) < 3.:  # sample < 2 or
                     if config.currentRating < 1.:
                         nextTemp = noxioustemps[sample] + 3
                     elif config.currentRating <= 3.:
